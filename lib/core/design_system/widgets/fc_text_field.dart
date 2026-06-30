@@ -21,6 +21,7 @@ class FCTextField extends StatefulWidget {
     this.errorText,
     this.keyboardType,
     this.textInputAction,
+    this.textCapitalization = TextCapitalization.none,
     this.inputFormatters,
     this.obscureText = false,
     this.enabled = true,
@@ -41,6 +42,7 @@ class FCTextField extends StatefulWidget {
   final String? errorText;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+  final TextCapitalization textCapitalization;
   final List<TextInputFormatter>? inputFormatters;
   final bool obscureText;
   final bool enabled;
@@ -140,6 +142,7 @@ class _FCTextFieldState extends State<FCTextField> {
               obscureText: widget.obscureText,
               keyboardType: widget.keyboardType,
               textInputAction: widget.textInputAction,
+              textCapitalization: widget.textCapitalization,
               inputFormatters: widget.inputFormatters,
               maxLines: widget.obscureText ? 1 : widget.maxLines,
               minLines: widget.minLines,
