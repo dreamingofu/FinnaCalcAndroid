@@ -74,10 +74,10 @@ void main() {
     testWidgets('tapping a tab switches the visible page', (tester) async {
       await tester.pumpWidget(harness());
       await tester.pumpAndSettle();
-      // Education is a placeholder tab (no network/webview); its note is unique.
+      // Education tab is local-data only (no network/webview/providers).
       await tester.tap(find.text('Education').last);
       await tester.pumpAndSettle();
-      expect(find.textContaining('financial education hub'), findsOneWidget);
+      expect(find.text('Financial Education Hub'), findsOneWidget);
     });
   });
 }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../core/auth/auth_service.dart';
 import '../core/design_system/design_system.dart';
 import '../core/networking/api_client.dart';
+import '../core/theme/theme_controller.dart';
 import '../features/budgeting/budget_controller.dart';
 import '../features/budgeting/plaid_service.dart';
 import '../features/investing/services/market_data_service.dart';
@@ -53,14 +54,19 @@ class FinnaCalcApp extends StatelessWidget {
         ProxyProvider<ApiClient, ChatService>(
           update: (_, api, _) => ChatService(api),
         ),
+        ChangeNotifierProvider<ThemeController>(
+          create: (_) => ThemeController()..load(),
+        ),
       ],
-      child: MaterialApp(
-        title: 'FinnaCalc',
-        debugShowCheckedModeBanner: false,
-        theme: FCTheme.light(),
-        darkTheme: FCTheme.dark(),
-        themeMode: ThemeMode.light,
-        home: const NavigationShell(),
+      child: Consumer<ThemeController>(
+        builder: (context, themeController, _) => MaterialApp(
+          title: 'FinnaCalc',
+          debugShowCheckedModeBanner: false,
+          theme: FCTheme.light(),
+          darkTheme: FCTheme.dark(),
+          themeMode: themeController.mode,
+          home: const NavigationShell(),
+        ),
       ),
     );
   }

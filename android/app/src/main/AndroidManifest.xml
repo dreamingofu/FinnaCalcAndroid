@@ -2,7 +2,7 @@
     <!-- Required for Supabase auth, the backend API, and all network plugins. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="finnacalc"
+        android:label="FinnaCalc"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
