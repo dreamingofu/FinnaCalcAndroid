@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide Headers;
 
 import '../config/app_config.dart';
@@ -31,7 +34,7 @@ String? _supabaseAccessToken() {
 /// as a `Bearer` header when available (the web used same-origin cookies; the
 /// mobile client forwards the JWT, per the plan's Phase 0 backend work).
 class ApiClient {
-  ApiClient({Dio? dio, AccessTokenProvider? accessToken})
+  ApiClient({Dio? dio, AccessTokenProvider? accessToken, CookieJar? cookieJar})
       : _accessToken = accessToken ?? _supabaseAccessToken,
         _dio = dio ??
             Dio(BaseOptions(
@@ -40,6 +43,9 @@ class ApiClient {
               receiveTimeout: const Duration(seconds: 60),
               headers: const {'Accept': 'application/json'},
             )) {
+    // Cookie jar so SnapTrade's `snaptrade_session` cookie set by /connect is
+    // replayed on /accounts (the web relied on same-origin cookies).
+    _dio.interceptors.add(CookieManager(cookieJar ?? CookieJar()));
     _dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
       final token = _accessToken();
       if (token != null && token.isNotEmpty) {
@@ -47,6 +53,19 @@ class ApiClient {
       }
       handler.next(options);
     }));
+  }
+
+  /// Builds an [ApiClient] whose cookies persist across app restarts (used so
+  /// the SnapTrade session survives). Falls back to an in-memory jar on error.
+  static Future<ApiClient> createPersistent() async {
+    CookieJar jar;
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      jar = PersistCookieJar(storage: FileStorage('${dir.path}/.cookies'));
+    } catch (_) {
+      jar = CookieJar();
+    }
+    return ApiClient(cookieJar: jar);
   }
 
   final Dio _dio;

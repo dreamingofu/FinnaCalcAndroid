@@ -28,6 +28,9 @@ class NavigationShell extends StatefulWidget {
 
 class _NavigationShellState extends State<NavigationShell> {
   int _index = 0;
+  // Tabs are built lazily on first visit so heavy tabs (Investing's webviews /
+  // market-data fetch) don't run until the user opens them.
+  final Set<int> _visited = {0};
 
   static const _tabs = <_Tab>[
     _Tab('Home', Icons.home_outlined, Icons.home, HomeScreen()),
@@ -47,12 +50,18 @@ class _NavigationShellState extends State<NavigationShell> {
       appBar: const FCHeader(),
       body: IndexedStack(
         index: _index,
-        children: [for (final tab in _tabs) tab.screen],
+        children: [
+          for (var i = 0; i < _tabs.length; i++)
+            _visited.contains(i) ? _tabs[i].screen : const SizedBox.shrink(),
+        ],
       ),
       bottomNavigationBar: _FCBottomNav(
         index: _index,
         tabs: _tabs,
-        onSelect: (i) => setState(() => _index = i),
+        onSelect: (i) => setState(() {
+          _index = i;
+          _visited.add(i);
+        }),
       ),
     );
   }

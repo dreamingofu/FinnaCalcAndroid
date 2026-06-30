@@ -45,6 +45,9 @@ dependencies:
   webview_flutter: ^4.14.0
   flutter_custom_tabs: ^2.5.0
   plaid_flutter: ^5.1.1
+  cookie_jar: ^4.0.9
+  dio_cookie_manager: ^3.4.0
+  path_provider: ^2.1.6
 
 dev_dependencies:
   flutter_test:

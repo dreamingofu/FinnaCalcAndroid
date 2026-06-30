@@ -74,10 +74,10 @@ void main() {
     testWidgets('tapping a tab switches the visible page', (tester) async {
       await tester.pumpWidget(harness());
       await tester.pumpAndSettle();
-      // Investing page description is unique to that screen.
-      await tester.tap(find.text('Investing').last);
+      // Education is a placeholder tab (no network/webview); its note is unique.
+      await tester.tap(find.text('Education').last);
       await tester.pumpAndSettle();
-      expect(find.textContaining('Stocks, bonds'), findsOneWidget);
+      expect(find.textContaining('financial education hub'), findsOneWidget);
     });
   });
 }
