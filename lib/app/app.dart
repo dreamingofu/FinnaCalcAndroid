@@ -9,6 +9,7 @@ import '../features/budgeting/plaid_service.dart';
 import '../features/investing/services/market_data_service.dart';
 import '../features/investing/services/portfolio_service.dart';
 import '../features/investing/services/snaptrade_service.dart';
+import '../features/taxes/tax_controller.dart';
 import 'navigation_shell.dart';
 
 /// Root widget. Provides [AuthService] to the tree and applies the design
@@ -44,6 +45,9 @@ class FinnaCalcApp extends StatelessWidget {
         ),
         ProxyProvider2<ApiClient, PlaidService, PortfolioService>(
           update: (_, api, plaid, _) => PortfolioService(api, plaid),
+        ),
+        ChangeNotifierProvider<TaxController>(
+          create: (_) => TaxController()..load(),
         ),
       ],
       child: MaterialApp(
