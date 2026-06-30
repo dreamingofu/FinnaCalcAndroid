@@ -5,6 +5,7 @@ import '../core/auth/auth_service.dart';
 import '../core/design_system/design_system.dart';
 import '../features/auth/sign_in_screen.dart';
 import '../features/auth/sign_up_screen.dart';
+import '../features/pages/more_screen.dart';
 
 /// The FinnaCalc wordmark — "Finna" in the foreground colour, "Calc" in blue,
 /// mirroring `components/header.tsx`.
@@ -67,6 +68,25 @@ class FCHeader extends StatelessWidget implements PreferredSizeWidget {
                 const FCWordmark(),
                 const Spacer(),
                 const _AuthActions(),
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: const Icon(Icons.more_horiz),
+                  tooltip: 'More',
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (ctx) => Scaffold(
+                        backgroundColor: ctx.colors.background,
+                        appBar: AppBar(
+                          backgroundColor: ctx.colors.background,
+                          surfaceTintColor: Colors.transparent,
+                          elevation: 0,
+                          foregroundColor: ctx.colors.foreground,
+                        ),
+                        body: const SafeArea(top: false, child: MoreScreen()),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

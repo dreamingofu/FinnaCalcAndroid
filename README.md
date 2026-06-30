@@ -49,3 +49,23 @@ flutter run        # on a connected Android device/emulator
 
 Requires Flutter 3.44+ / Dart 3.12+. `minSdkVersion` is Flutter's managed default (24),
 which satisfies Plaid (≥21) and modern AndroidX plugins.
+
+## Status
+
+All eight phases of the port are implemented (271 passing tests; `flutter analyze`
+clean; debug APK builds):
+
+1. **Design system** — shadcn/ui tokens + `FC*` widgets (light + dark).
+2. **Auth + navigation** — Supabase (email/password + native Google), bottom-nav shell.
+3. **Calculators** — all nine standalone calculators, math ported 1:1 with golden tests.
+4. **Budgeting + Plaid** — dashboard, expense pie, debt card, streaming AI budget advisor.
+5. **Investing** — market data, SnapTrade, Plaid portfolio + charts, TradingView webviews.
+6. **Taxes** — the full ~6.5k-line 1040 engine ported to pure Dart with **176 golden tests**,
+   plus the interview UI.
+7. **FinnaBot chat** — streaming `/api/chat`.
+8. **Pages + polish** — about/advising/premium/privacy/terms, education hub, app icon,
+   splash screen, dark-mode toggle (More screen), and accessibility labels.
+
+Dark mode is available via the **More** screen (header ⋯). The backend-dependent features
+(auth, Plaid, SnapTrade, market data, AI) are built to the web's exact API contracts and need
+the corresponding credentials in `assets/.env` and the backend's Phase 0 work to run live.
