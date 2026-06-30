@@ -9,6 +9,7 @@ import '../features/budgeting/plaid_service.dart';
 import '../features/investing/services/market_data_service.dart';
 import '../features/investing/services/portfolio_service.dart';
 import '../features/investing/services/snaptrade_service.dart';
+import '../features/chat/chat_service.dart';
 import '../features/taxes/tax_controller.dart';
 import 'navigation_shell.dart';
 
@@ -48,6 +49,9 @@ class FinnaCalcApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<TaxController>(
           create: (_) => TaxController()..load(),
+        ),
+        ProxyProvider<ApiClient, ChatService>(
+          update: (_, api, _) => ChatService(api),
         ),
       ],
       child: MaterialApp(

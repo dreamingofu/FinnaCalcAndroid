@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/design_system/design_system.dart';
 import '../features/budgeting/budgeting_screen.dart';
+import '../features/chat/chat_screen.dart';
 import '../features/education/education_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/investing/investing_screen.dart';
@@ -54,6 +55,16 @@ class _NavigationShellState extends State<NavigationShell> {
           for (var i = 0; i < _tabs.length; i++)
             _visited.contains(i) ? _tabs[i].screen : const SizedBox.shrink(),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: FCPalette.blue600,
+        foregroundColor: Colors.white,
+        elevation: 2,
+        tooltip: 'Ask FinnaBot',
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const ChatScreen()),
+        ),
+        child: const Icon(Icons.smart_toy_outlined),
       ),
       bottomNavigationBar: _FCBottomNav(
         index: _index,
