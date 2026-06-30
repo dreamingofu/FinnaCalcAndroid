@@ -30,7 +30,7 @@ class PlaidService {
 
   /// Runs the Plaid Link SDK and resolves to the `public_token`, or null if the
   /// user exited without connecting.
-  Future<String?> _linkAndGetPublicToken(String product) async {
+  Future<String?> linkAndGetPublicToken(String product) async {
     final linkToken = await createLinkToken(product);
     final completer = Completer<String?>();
     late final StreamSubscription<LinkSuccess> successSub;
@@ -58,7 +58,7 @@ class PlaidService {
   /// Returns imported transactions, or null if the user cancelled. Throws
   /// [ApiException] on failure or when no transactions are found.
   Future<List<BankTransaction>?> importTransactions() async {
-    final publicToken = await _linkAndGetPublicToken('transactions');
+    final publicToken = await linkAndGetPublicToken('transactions');
     if (publicToken == null) return null;
     final data = await _api.postJson(
       ApiEndpoints.plaidTransactions,
@@ -78,7 +78,7 @@ class PlaidService {
   /// Returns liabilities, or null if the user cancelled. Throws [ApiException]
   /// on failure or when no credit/loans are found.
   Future<LiabilitiesResponse?> importLiabilities() async {
-    final publicToken = await _linkAndGetPublicToken('liabilities');
+    final publicToken = await linkAndGetPublicToken('liabilities');
     if (publicToken == null) return null;
     final data = await _api.postJson(
       ApiEndpoints.plaidLiabilities,

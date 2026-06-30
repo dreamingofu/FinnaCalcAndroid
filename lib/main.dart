@@ -5,6 +5,6 @@ import 'app/bootstrap.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final authService = await bootstrap();
-  runApp(FinnaCalcApp(authService: authService));
+  final services = await bootstrap();
+  runApp(FinnaCalcApp(authService: services.auth, apiClient: services.api));
 }
