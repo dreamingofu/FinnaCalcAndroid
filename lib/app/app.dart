@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../core/auth/auth_service.dart';
 import '../core/design_system/design_system.dart';
+import '../core/networking/api_client.dart';
+import '../features/budgeting/budget_controller.dart';
+import '../features/budgeting/plaid_service.dart';
 import 'navigation_shell.dart';
 
 /// Root widget. Provides [AuthService] to the tree and applies the design
@@ -15,8 +18,17 @@ class FinnaCalcApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<AuthService>.value(
-      value: authService,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthService>.value(value: authService),
+        Provider<ApiClient>(create: (_) => ApiClient()),
+        ProxyProvider<ApiClient, PlaidService>(
+          update: (_, api, _) => PlaidService(api),
+        ),
+        ChangeNotifierProvider<BudgetController>(
+          create: (_) => BudgetController()..load(),
+        ),
+      ],
       child: MaterialApp(
         title: 'FinnaCalc',
         debugShowCheckedModeBanner: false,
