@@ -19,9 +19,10 @@ android {
         applicationId = "com.finnacalc.finnacalc"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        // Plaid's Android SDK requires a minimum of 21; modern AndroidX
-        // plugins (supabase_flutter, plaid_flutter) require 23, which satisfies it.
-        minSdk = 23
+        // Flutter 3.44's managed default is minSdk 24, which satisfies Plaid's
+        // Android SDK (>=21) and modern AndroidX plugins. A debug APK builds
+        // cleanly against it with all plugins, so we keep the managed default.
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

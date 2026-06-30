@@ -47,5 +47,5 @@ flutter test
 flutter run        # on a connected Android device/emulator
 ```
 
-Requires Flutter 3.44+ / Dart 3.12+. `minSdkVersion` is 23 (Plaid needs ≥21; modern AndroidX
-plugins need 23).
+Requires Flutter 3.44+ / Dart 3.12+. `minSdkVersion` is Flutter's managed default (24),
+which satisfies Plaid (≥21) and modern AndroidX plugins.
