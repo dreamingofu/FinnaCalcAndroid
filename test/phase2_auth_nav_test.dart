@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:finnacalc/app/navigation_shell.dart';
 import 'package:finnacalc/core/auth/auth_service.dart';
 import 'package:finnacalc/core/design_system/design_system.dart';
+import 'package:finnacalc/core/networking/api_client.dart';
+import 'package:finnacalc/features/budgeting/budget_controller.dart';
+import 'package:finnacalc/features/budgeting/plaid_service.dart';
 
 void main() {
   group('AuthService (not configured)', () {
@@ -34,8 +37,16 @@ void main() {
   group('NavigationShell', () {
     Widget harness() {
       final auth = AuthService(configured: false)..start();
-      return ChangeNotifierProvider<AuthService>.value(
-        value: auth,
+      final api = ApiClient();
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AuthService>.value(value: auth),
+          Provider<ApiClient>.value(value: api),
+          Provider<PlaidService>(create: (_) => PlaidService(api)),
+          ChangeNotifierProvider<BudgetController>(
+            create: (_) => BudgetController(),
+          ),
+        ],
         child: MaterialApp(
           theme: FCTheme.light(),
           home: const NavigationShell(),
