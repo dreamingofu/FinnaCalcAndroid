@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
+import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Home
@@ -53,19 +54,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.finnacalc.android.FinnaApp
 import com.finnacalc.android.core.auth.AuthManager
 import com.finnacalc.android.core.designsystem.AppearanceSetting
 import com.finnacalc.android.core.designsystem.FCWordmark
 import com.finnacalc.android.core.designsystem.Theme
-import com.finnacalc.android.FinnaApp
 import com.finnacalc.android.features.auth.AccountScreen
 import com.finnacalc.android.features.auth.AuthScreen
 import com.finnacalc.android.features.budgeting.BudgetingFeature
 import com.finnacalc.android.features.calculators.CalculatorsHubView
+import com.finnacalc.android.features.chat.ChatViewModel
+import com.finnacalc.android.features.chat.FinnaBotSheet
 import com.finnacalc.android.features.investing.InvestingFeature
 import com.finnacalc.android.features.shared.ComingSoonView
 import com.finnacalc.android.features.taxes.ui.TaxesScreen
@@ -106,12 +110,26 @@ private fun MainTabs(
     var selection by rememberSaveable { mutableStateOf(FinnaTab.Home) }
     var showAccount by rememberSaveable { mutableStateOf(false) }
     var showAuth by rememberSaveable { mutableStateOf(false) }
+    var showChat by rememberSaveable { mutableStateOf(false) }
     val user by auth.user.collectAsState()
+
+    // FinnaBot lives at the shell so the conversation survives panel open/close.
+    val chat: ChatViewModel = viewModel()
 
     // Cross-tab links ("Manage →", "Portfolio →") land here.
     LaunchedEffect(Unit) {
         CrossTabNavigation.switchTab.collect { id ->
             FinnaTab.entries.firstOrNull { it.id == id }?.let { selection = it }
+        }
+    }
+
+    // A page elsewhere in the app wants FinnaBot to look at something. It goes
+    // into the shell's one conversation, typed and not sent, so the thread
+    // stays single and the user sees what is about to be sent.
+    LaunchedEffect(Unit) {
+        CrossTabNavigation.askChat.collect { question ->
+            chat.setInput(question)
+            showChat = true
         }
     }
 
@@ -127,6 +145,17 @@ private fun MainTabs(
                     )
                 },
                 actions = {
+                    // FinnaBot's entry point until Phase 8 brings the Home
+                    // dashboard's ambient prompt bar, which is where iOS opens
+                    // it from. Reachable from every tab in the meantime rather
+                    // than shipped unreachable.
+                    IconButton(onClick = { showChat = true }) {
+                        Icon(
+                            Icons.AutoMirrored.Outlined.Chat,
+                            contentDescription = "FinnaBot",
+                            tint = Theme.colors.primary,
+                        )
+                    }
                     // Account is the settings hub for everyone — signed-out
                     // users get a Sign in entry point inside it. Always the
                     // icon, never the user's name, so the bar stays visually
@@ -195,6 +224,10 @@ private fun MainTabs(
     }
 
     // MARK: Sheets
+
+    if (showChat) {
+        FinnaBotSheet(chat) { showChat = false }
+    }
 
     if (showAccount) {
         ModalBottomSheet(

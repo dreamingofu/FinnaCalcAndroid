@@ -8,10 +8,8 @@
 // open; nothing here is invented and nothing is rounded into a claim the
 // numbers don't support.
 //
-// Deviation from iOS: the AI report (the streamed advisor call and its
-// snapshot cache) rides on the chat infrastructure and lands in Phase 7. The
-// screen shows the local findings now and says where the written analysis
-// will appear, rather than implying an analysis that isn't there.
+// The streamed AI report and its snapshot cache live in AdvisorReportSection,
+// mounted under the findings.
 //
 
 package com.finnacalc.android.features.budgeting
@@ -39,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -110,21 +109,19 @@ fun BudgetAdvisorScreen(
             }
         }
 
-        // The written analysis rides on the chat infrastructure (Phase 7).
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .ambientGlow(18.dp)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Text("Written analysis", style = Theme.sans(14, FontWeight.Bold), color = Theme.colors.foreground)
-            Text(
-                "FinnaBot's written read of this budget arrives with the chat feature. The findings above are computed on this device from your own figures and don't need it.",
-                style = Theme.sans(12),
-                color = Theme.colors.mutedForeground,
-            )
-        }
+        AdvisorReportSection(store)
+
+        // One disclaimer for the page, at the foot of everything, rather than a
+        // line under the findings and another under every answer: repeating it
+        // after each reply made the conversation read like a legal form.
+        Text(
+            "Built from the budget you have open in My Budget. AI-generated for general education, " +
+                "not financial advice.",
+            style = Theme.sans(11).copy(fontStyle = FontStyle.Italic),
+            color = Theme.colors.mutedForeground,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
         Spacer(Modifier.height(8.dp))
     }
 }
