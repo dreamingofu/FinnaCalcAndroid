@@ -51,6 +51,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.finnacalc.android.app.CrossTabNavigation
 import com.finnacalc.android.core.auth.AuthManager
 import com.finnacalc.android.core.designsystem.FCTextField
 import com.finnacalc.android.core.designsystem.Theme
@@ -124,6 +125,16 @@ private fun InvestingHome(
     onTrade: (String, Boolean) -> Unit,
 ) {
     var activeTab by remember { mutableStateOf(InvestingTab.Discover) }
+
+    // A Home card asked for a specific tab on the way in. One-shot.
+    LaunchedEffect(Unit) {
+        when (CrossTabNavigation.pendingInvestingTab) {
+            "portfolio" -> activeTab = InvestingTab.Portfolio
+            "screener" -> activeTab = InvestingTab.Screener
+            "discover" -> activeTab = InvestingTab.Discover
+        }
+        CrossTabNavigation.pendingInvestingTab = null
+    }
     var searchTerm by remember { mutableStateOf("") }
     var searchResults by remember { mutableStateOf<List<StockSearchResult>>(emptyList()) }
     var isSearching by remember { mutableStateOf(false) }

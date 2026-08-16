@@ -14,6 +14,7 @@
 
 package com.finnacalc.android.app
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +26,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
-import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Home
@@ -67,10 +67,12 @@ import com.finnacalc.android.core.designsystem.Theme
 import com.finnacalc.android.features.auth.AccountScreen
 import com.finnacalc.android.features.auth.AuthScreen
 import com.finnacalc.android.features.budgeting.BudgetingFeature
-import com.finnacalc.android.features.calculators.CalculatorsHubView
+import com.finnacalc.android.features.calculators.CalculatorDestination
+import com.finnacalc.android.features.calculators.CalculatorKind
 import com.finnacalc.android.features.chat.ChatViewModel
 import com.finnacalc.android.features.chat.FinnaBotSheet
 import com.finnacalc.android.features.education.EducationScreen
+import com.finnacalc.android.features.home.HomeScreen
 import com.finnacalc.android.features.investing.InvestingFeature
 import com.finnacalc.android.features.shared.ComingSoonView
 import com.finnacalc.android.features.taxes.ui.TaxesScreen
@@ -146,17 +148,6 @@ private fun MainTabs(
                     )
                 },
                 actions = {
-                    // FinnaBot's entry point until Phase 8 brings the Home
-                    // dashboard's ambient prompt bar, which is where iOS opens
-                    // it from. Reachable from every tab in the meantime rather
-                    // than shipped unreachable.
-                    IconButton(onClick = { showChat = true }) {
-                        Icon(
-                            Icons.AutoMirrored.Outlined.Chat,
-                            contentDescription = "FinnaBot",
-                            tint = Theme.colors.primary,
-                        )
-                    }
                     // Account is the settings hub for everyone — signed-out
                     // users get a Sign in entry point inside it. Always the
                     // icon, never the user's name, so the bar stays visually
@@ -206,9 +197,24 @@ private fun MainTabs(
         ) {
             Box(Modifier.widthIn(max = Theme.readableWidth)) {
                 when (selection) {
-                    // The calculator hub stands in for Home until the real
-                    // dashboard lands in Phase 8 and absorbs the catalog.
-                    FinnaTab.Home -> CalculatorsHubView()
+                    FinnaTab.Home -> {
+                        // The dashboard absorbed the calculator catalog, so a
+                        // tapped calculator pushes over Home rather than
+                        // living in its own tab.
+                        var calculator by rememberSaveable { mutableStateOf<CalculatorKind?>(null) }
+                        val open = calculator
+                        if (open != null) {
+                            BackHandler { calculator = null }
+                            CalculatorDestination(open)
+                        } else {
+                            HomeScreen(
+                                user = user,
+                                budget = (LocalContext.current.applicationContext as FinnaApp).budget,
+                                onOpenChat = { showChat = true },
+                                onOpenCalculator = { calculator = it },
+                            )
+                        }
+                    }
                     FinnaTab.Budgeting -> BudgetingFeature(
                         (LocalContext.current.applicationContext as FinnaApp).budget
                     )

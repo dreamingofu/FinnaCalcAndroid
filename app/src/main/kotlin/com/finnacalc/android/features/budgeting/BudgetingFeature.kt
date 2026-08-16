@@ -42,6 +42,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -55,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.finnacalc.android.app.CrossTabNavigation
 import com.finnacalc.android.core.designsystem.Paper
 import com.finnacalc.android.core.designsystem.PaperBigCard
 import com.finnacalc.android.core.designsystem.PaperSampleDonut
@@ -89,6 +91,19 @@ fun BudgetingFeature(store: BudgetStore) {
 
     if (stack.isNotEmpty()) {
         BackHandler { stack.removeAt(stack.lastIndex) }
+    }
+
+    // A Home card asked for a specific page on the way in. One-shot: read and
+    // cleared, so returning to the tab later lands on the hub as usual.
+    LaunchedEffect(Unit) {
+        when (CrossTabNavigation.pendingBudgetingPage) {
+            "budget" -> stack.add(BudgetingDest.MyBudget)
+            "goals" -> stack.add(BudgetingDest.Goals)
+            "history" -> stack.add(BudgetingDest.History)
+            "subscriptions" -> stack.add(BudgetingDest.Subscriptions)
+            "advisor" -> stack.add(BudgetingDest.Advisor)
+        }
+        CrossTabNavigation.pendingBudgetingPage = null
     }
 
     fun replaceWith(dest: BudgetingDest) {
