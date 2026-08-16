@@ -66,6 +66,7 @@ import com.finnacalc.android.features.auth.AccountScreen
 import com.finnacalc.android.features.auth.AuthScreen
 import com.finnacalc.android.features.budgeting.BudgetingFeature
 import com.finnacalc.android.features.calculators.CalculatorsHubView
+import com.finnacalc.android.features.investing.InvestingFeature
 import com.finnacalc.android.features.shared.ComingSoonView
 
 // MARK: - Tabs
@@ -180,11 +181,7 @@ private fun MainTabs(
                     FinnaTab.Budgeting -> BudgetingFeature(
                         (LocalContext.current.applicationContext as FinnaApp).budget
                     )
-                    FinnaTab.Investing -> ComingSoonView(
-                        FinnaTab.Investing.icon, "Investing",
-                        "Markets, brokerage connections, and your portfolio will live here.",
-                        "Coming in Phase 5",
-                    )
+                    FinnaTab.Investing -> InvestingFeature()
                     FinnaTab.Taxes -> ComingSoonView(
                         FinnaTab.Taxes.icon, "Taxes",
                         "The 1040 interview and estimate engine will live here.",
