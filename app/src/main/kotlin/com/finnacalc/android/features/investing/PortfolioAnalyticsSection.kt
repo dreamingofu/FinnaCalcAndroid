@@ -256,6 +256,10 @@ fun PortfolioAnalyticsSection(state: PortfolioUiState) {
                 }
             }
         }
+
+        // The conversation about the mix, at the bottom of the analysis, where
+        // iOS puts it under the performance card.
+        CardSurface { PortfolioChatThread(holdings) }
     }
 }
 
