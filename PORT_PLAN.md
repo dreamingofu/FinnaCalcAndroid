@@ -24,7 +24,7 @@ idioms don't map 1:1, use the closest Compose equivalent (noted below).
 ## Phases (each = branch → PR → squash-merge, build must pass)
 
 - **0. Scaffold** — Gradle/AGP/Kotlin/Compose project, package `com.finnacalc.android`. ✅
-- **1. Design system** — port `Core/DesignSystem` (Theme.swift tokens both palettes, figure/mono type styles, FCButton/FCCard/FCTextField/FCBadge equivalents, Motion). Bundle IBM Plex fonts.
+- **1. Design system** — port `Core/DesignSystem` (Theme.swift tokens both palettes, figure/mono type styles, FCButton/FCCard/FCTextField/FCBadge equivalents, Motion). Bundle IBM Plex fonts. ✅
 - **2. Auth + shell** — Supabase auth (`Core/Auth`), RootView tab shell (5 tabs: Home, Budgeting, Investing, Taxes, Education), account sheet, splash, appearance setting.
 - **3. Calculators** — `Features/Calculators`: nine standalone calculators.
 - **4. Budgeting + Plaid** — `Core/Networking` API client, `Features/Budgeting` (BudgetStore, dashboard, editor, advisor), Plaid link.
