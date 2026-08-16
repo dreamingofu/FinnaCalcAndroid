@@ -53,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -60,8 +61,10 @@ import com.finnacalc.android.core.auth.AuthManager
 import com.finnacalc.android.core.designsystem.AppearanceSetting
 import com.finnacalc.android.core.designsystem.FCWordmark
 import com.finnacalc.android.core.designsystem.Theme
+import com.finnacalc.android.FinnaApp
 import com.finnacalc.android.features.auth.AccountScreen
 import com.finnacalc.android.features.auth.AuthScreen
+import com.finnacalc.android.features.budgeting.BudgetingFeature
 import com.finnacalc.android.features.calculators.CalculatorsHubView
 import com.finnacalc.android.features.shared.ComingSoonView
 
@@ -174,10 +177,8 @@ private fun MainTabs(
                     // The calculator hub stands in for Home until the real
                     // dashboard lands in Phase 8 and absorbs the catalog.
                     FinnaTab.Home -> CalculatorsHubView()
-                    FinnaTab.Budgeting -> ComingSoonView(
-                        FinnaTab.Budgeting.icon, "Budgeting",
-                        "Income, expenses, goals, and bank sync will live here.",
-                        "Coming in Phase 4",
+                    FinnaTab.Budgeting -> BudgetingFeature(
+                        (LocalContext.current.applicationContext as FinnaApp).budget
                     )
                     FinnaTab.Investing -> ComingSoonView(
                         FinnaTab.Investing.icon, "Investing",
