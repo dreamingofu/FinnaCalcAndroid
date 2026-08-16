@@ -1,38 +1,47 @@
 package com.finnacalc.android
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.ui.Modifier
-import com.finnacalc.android.core.designsystem.DesignSystemGallery
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import com.finnacalc.android.app.RootView
+import com.finnacalc.android.core.designsystem.AppearanceSetting
 import com.finnacalc.android.core.designsystem.FinnaTheme
-import com.finnacalc.android.core.designsystem.Theme
+import kotlinx.coroutines.launch
 
 /**
  * App entry point. Native Kotlin + Jetpack Compose port of FinnaCalcIOS.
- *
- * Phase 1: shows the design-system gallery for QA. The tab shell (RootView)
- * replaces this in Phase 2.
+ * The app-scoped singletons (auth, appearance) live on [FinnaApp]; this
+ * activity hosts the shell and forwards OAuth deep links to the auth client.
  */
 class MainActivity : ComponentActivity() {
+    private val app get() = application as FinnaApp
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // A cold start from the OAuth redirect delivers the link here.
+        app.auth.handleDeeplink(intent)
         setContent {
-            FinnaTheme {
-                DesignSystemGallery(
-                    Modifier
-                        .fillMaxSize()
-                        // Paint the page color under the system bars too, so
-                        // the edge-to-edge gutters read as one surface.
-                        .background(Theme.colors.background)
-                        .safeDrawingPadding(),
+            val appearance by app.appearanceStore.setting.collectAsState(AppearanceSetting.System)
+            val scope = rememberCoroutineScope()
+            FinnaTheme(darkTheme = appearance.resolvesToDark()) {
+                RootView(
+                    auth = app.auth,
+                    appearance = appearance,
+                    onAppearanceChange = { scope.launch { app.appearanceStore.set(it) } },
                 )
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        // A warm app receiving finnacalc://auth-callback lands here.
+        app.auth.handleDeeplink(intent)
     }
 }
