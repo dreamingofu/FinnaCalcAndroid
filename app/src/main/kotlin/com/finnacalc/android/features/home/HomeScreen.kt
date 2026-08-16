@@ -37,8 +37,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.CallMade
-import androidx.compose.material.icons.filled.CallReceived
+import androidx.compose.material.icons.filled.NorthEast
+import androidx.compose.material.icons.filled.SouthEast
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -401,7 +401,7 @@ private fun InvestingBigCard(user: AuthUser?) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            if (up) Icons.Filled.CallMade else Icons.Filled.CallReceived,
+                            if (up) Icons.Filled.NorthEast else Icons.Filled.SouthEast,
                             contentDescription = null,
                             tint = if (up) Paper.positive else Paper.negative,
                             modifier = Modifier.size(18.dp),
@@ -486,7 +486,7 @@ private fun GoalsBigCard(budget: BudgetStore) {
                                 "of ${Paper.compactMoney(goal.targetValue)}"
                             }
                             GoalRow(
-                                emoji = goal.emoji ?: "📈",
+                                emoji = goal.resolvedEmoji,
                                 title = goal.name,
                                 detail = detail,
                                 fraction = fraction,

@@ -263,7 +263,7 @@ private fun ConfirmAccess(
             "Back",
             style = Theme.sans(Theme.FontSize.sm, FontWeight.SemiBold),
             color = Theme.colors.primary,
-            modifier = Modifier.clickable(onClick = onBack),
+            modifier = Modifier.fcPressable(onBack),
         )
         Text("Connect ${broker.name}", style = Theme.sans(18, FontWeight.Bold), color = Theme.colors.foreground)
 

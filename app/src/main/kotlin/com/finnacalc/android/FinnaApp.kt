@@ -13,6 +13,7 @@ import android.app.Application
 import com.finnacalc.android.core.auth.AuthManager
 import com.finnacalc.android.core.designsystem.AppearanceStore
 import com.finnacalc.android.core.feedback.FeedbackService
+import com.finnacalc.android.core.market.FinnaImageLoader
 import com.finnacalc.android.core.networking.ApiClient
 import com.finnacalc.android.core.notifications.Notifier
 import com.finnacalc.android.core.util.JsonPrefs
@@ -52,6 +53,7 @@ class FinnaApp : Application() {
         entitlements = EntitlementStore(this)
         FeedbackService.readVersion(this)
         Notifier.init(this)
+        FinnaImageLoader.install(this)
         // Forward the Supabase access token to the API client as a Bearer.
         ApiClient.shared.tokenProvider = { auth.accessToken() }
     }
