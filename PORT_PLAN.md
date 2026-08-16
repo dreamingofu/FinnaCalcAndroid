@@ -34,7 +34,7 @@ idioms don't map 1:1, use the closest Compose equivalent (noted below).
 - **5. Investing** — SnapTrade, market data, portfolio ledger, charts. Split in three PRs:
   - **5a** — services + data: Market models/service, SnapTrade models/service (+ cookie jar for its session), Brandfetch/Logo.dev logo URLs, WatchlistStore, SectorCatalog, PortfolioAnalytics engine, PortfolioFundamentalsStore. 14 unit tests. ✅
   - **5b** — market UI: Investing tab root with universal search, Discover (highlight carousel, news, category tiles), watchlist card, screener (list + heatmap), stock detail with the Canvas chart (line/candles, scrub, pinch-zoom, scales), sector pages. ✅ (ETF/bonds/safe reference pages fold into Phase 8's remaining pages)
-  - **5c** — brokerage UI: connect flow, portfolio ledger + analytics views, order ticket, trade tracker, investing goals.
+  - **5c** — brokerage UI: SnapTrade connect flow (own broker picker + access step), portfolio hero/holdings/orders with account selection, analytics cards, two-step order ticket. ✅ (trade tracker + investing goals fold into Phase 8)
 - **6. Taxes** — `Features/Taxes/Engine` (1040 engine, pure Kotlin + unit tests), interview UI, filing.
 - **7. FinnaBot chat** — streaming chat (`Features/Chat`), shell-level conversation state.
 - **8. Remaining + polish** — Education, Pages, Plans, Feedback, Goals (+ widget as Glance app widget), notifications (SubscriptionNotifier), real app icon, Home dashboard.

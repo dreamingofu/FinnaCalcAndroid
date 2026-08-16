@@ -181,7 +181,7 @@ private fun MainTabs(
                     FinnaTab.Budgeting -> BudgetingFeature(
                         (LocalContext.current.applicationContext as FinnaApp).budget
                     )
-                    FinnaTab.Investing -> InvestingFeature()
+                    FinnaTab.Investing -> InvestingFeature(auth)
                     FinnaTab.Taxes -> ComingSoonView(
                         FinnaTab.Taxes.icon, "Taxes",
                         "The 1040 interview and estimate engine will live here.",
