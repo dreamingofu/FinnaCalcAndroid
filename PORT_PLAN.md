@@ -42,6 +42,7 @@ idioms don't map 1:1, use the closest Compose equivalent (noted below).
 - **8. Remaining + polish** — split across several PRs:
   - **8a** — Plans over Google Play Billing, About/Privacy/Terms, Feedback. ✅
   - **8b** — Education tab: catalog, relevance search, topic and lesson pages. ✅
+  - **8c** — investing extras: investing goals (+ alert center), Trade Tracker, ETF/bonds/safe reference pages, and the notification layer they post through. ✅
 
 ## Conventions carried over from iOS (see ../FinnaCalcIOS/CLAUDE.md)
 

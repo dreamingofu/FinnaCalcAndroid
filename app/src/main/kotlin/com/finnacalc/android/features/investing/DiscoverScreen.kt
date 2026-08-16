@@ -28,6 +28,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -64,6 +66,7 @@ import java.util.Locale
 fun DiscoverScreen(
     onOpenSymbol: (String) -> Unit,
     onOpenSector: (SectorMeta) -> Unit,
+    onOpenPage: (InvestingDest) -> Unit,
 ) {
     var overview by remember { mutableStateOf<MarketOverviewResponse?>(null) }
     var indexStats by remember { mutableStateOf<List<MarketStat>>(emptyList()) }
@@ -100,6 +103,7 @@ fun DiscoverScreen(
                 HighlightCarousel(data, indexStats, onOpenSymbol)
                 if (news.isNotEmpty()) NewsSection(news)
                 CategoriesSection(onOpenSector)
+                ExploreSection(onOpenPage)
             }
         }
     }
@@ -382,6 +386,56 @@ fun SectorScreen(sector: SectorMeta, onOpenSymbol: (String) -> Unit) {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+
+// MARK: - Explore (reference pages + trade tracker)
+
+/**
+ * The curated reference pages, as entry cards. They carry no figures — each
+ * one is a door to a page that fetches its own, so nothing here can go stale.
+ */
+@Composable
+private fun ExploreSection(onOpenPage: (InvestingDest) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(
+            "EXPLORE",
+            style = Theme.sans(11, FontWeight.Bold).copy(letterSpacing = 1.2.sp),
+            color = Theme.colors.mutedForeground,
+        )
+        listOf(
+            Triple("Trade Tracker", "Investors, insiders, and politicians worth watching", InvestingDest.Tracker),
+            Triple("ETFs & Index Funds", "One purchase, hundreds of companies", InvestingDest.Etfs),
+            Triple("Safe Investments", "The steadiest options, and what they really return", InvestingDest.Safe),
+            Triple("Bonds", "Lending your money instead of owning a share", InvestingDest.Bonds),
+        ).forEach { (title, blurb, dest) ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Theme.colors.card)
+                    .border(1.dp, Theme.colors.border, RoundedCornerShape(16.dp))
+                    .fcPressable { onOpenPage(dest) }
+                    .padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        title,
+                        style = Theme.sans(Theme.FontSize.sm, FontWeight.SemiBold),
+                        color = Theme.colors.foreground,
+                    )
+                    Text(blurb, style = Theme.sans(11), color = Theme.colors.mutedForeground)
+                }
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = Theme.colors.borderStrong,
+                    modifier = Modifier.size(18.dp),
+                )
             }
         }
     }

@@ -63,6 +63,10 @@ import kotlinx.coroutines.delay
 sealed class InvestingDest {
     data class Stock(val symbol: String) : InvestingDest()
     data class Sector(val sectorId: String) : InvestingDest()
+    data object Etfs : InvestingDest()
+    data object Bonds : InvestingDest()
+    data object Safe : InvestingDest()
+    data object Tracker : InvestingDest()
 }
 
 private enum class InvestingTab(val title: String) {
@@ -95,6 +99,10 @@ fun InvestingFeature(auth: AuthManager) {
                 SectorScreen(sector) { stack.add(InvestingDest.Stock(it)) }
             }
         }
+        is InvestingDest.Etfs -> EtfListScreen { stack.add(InvestingDest.Stock(it)) }
+        is InvestingDest.Bonds -> BondsScreen()
+        is InvestingDest.Safe -> SafeInvestmentsScreen()
+        is InvestingDest.Tracker -> TradeTrackerScreen { stack.add(InvestingDest.Stock(it)) }
     }
 
     ticket?.let { (symbol, sell) ->
@@ -193,6 +201,7 @@ private fun InvestingHome(
             InvestingTab.Discover -> DiscoverScreen(
                 onOpenSymbol = { push(InvestingDest.Stock(it)) },
                 onOpenSector = { push(InvestingDest.Sector(it.id)) },
+                onOpenPage = { push(it) },
             )
             InvestingTab.Portfolio -> {
                 val portfolioViewModel: PortfolioViewModel = viewModel()
@@ -206,6 +215,7 @@ private fun InvestingHome(
                         onTrade = onTrade,
                         viewModel = portfolioViewModel,
                     )
+                    InvestingGoalsSection(portfolioState.positions)
                     if (portfolioState.holdings.isNotEmpty()) {
                         PortfolioAnalyticsSection(portfolioState)
                     }
