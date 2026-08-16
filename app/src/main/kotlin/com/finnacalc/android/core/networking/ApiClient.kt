@@ -84,6 +84,10 @@ class ApiClient(
         .connectTimeout(30, TimeUnit.SECONDS)
         // Streaming chat responses stay open well past a normal read window.
         .readTimeout(120, TimeUnit.SECONDS)
+        // The SnapTrade session lives in an httpOnly cookie set on the connect
+        // response; this jar carries it to the accounts call automatically —
+        // the OkHttp analogue of URLSession's shared cookie storage on iOS.
+        .cookieJar(InMemoryCookieJar())
         .build()
 
     // MARK: Requests
@@ -218,4 +222,24 @@ class ApiClient(
     companion object {
         val shared = ApiClient()
     }
+}
+
+/**
+ * Session-lifetime cookie storage. Cookies here are session cookies (the
+ * SnapTrade httpOnly session); nothing needs to survive a restart, and the
+ * backend re-registers on the next connect call if it's gone.
+ */
+private class InMemoryCookieJar : okhttp3.CookieJar {
+    private val store = mutableMapOf<String, List<okhttp3.Cookie>>()
+
+    @Synchronized
+    override fun saveFromResponse(url: okhttp3.HttpUrl, cookies: List<okhttp3.Cookie>) {
+        val existing = store[url.host] ?: emptyList()
+        val merged = (cookies + existing).distinctBy { it.name }
+        store[url.host] = merged
+    }
+
+    @Synchronized
+    override fun loadForRequest(url: okhttp3.HttpUrl): List<okhttp3.Cookie> =
+        (store[url.host] ?: emptyList()).filter { it.expiresAt > System.currentTimeMillis() }
 }
