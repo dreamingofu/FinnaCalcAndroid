@@ -14,6 +14,7 @@
 
 package com.finnacalc.android.features.auth
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -40,6 +41,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -60,6 +62,15 @@ import com.finnacalc.android.core.designsystem.AppearanceSetting
 import com.finnacalc.android.core.designsystem.Theme
 import com.finnacalc.android.core.designsystem.fcPressable
 import com.finnacalc.android.core.networking.ApiException
+import com.finnacalc.android.features.feedback.FeedbackSheet
+import com.finnacalc.android.features.feedback.FeedbackSource
+import com.finnacalc.android.features.pages.AboutScreen
+import com.finnacalc.android.features.pages.PrivacyScreen
+import com.finnacalc.android.features.pages.TermsScreen
+import com.finnacalc.android.features.plans.EntitlementStore
+import com.finnacalc.android.features.plans.PlanCatalog
+import com.finnacalc.android.features.plans.PlanTier
+import com.finnacalc.android.features.plans.PlansScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -67,6 +78,7 @@ fun AccountScreen(
     auth: AuthManager,
     user: AuthUser?,
     appearance: AppearanceSetting,
+    entitlements: EntitlementStore,
     onAppearanceChange: (AppearanceSetting) -> Unit,
     onShowAuth: () -> Unit,
     onDismiss: () -> Unit,
@@ -74,8 +86,24 @@ fun AccountScreen(
     var working by rememberSaveable { mutableStateOf(false) }
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
     var deleteError by rememberSaveable { mutableStateOf<String?>(null) }
-    var showComingSoon by rememberSaveable { mutableStateOf<String?>(null) }
+    var subpage by rememberSaveable { mutableStateOf<AccountSubpage?>(null) }
+    var showFeedback by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val activeTier by entitlements.activeTier.collectAsState()
+
+    // A tapped row takes the sheet over, with a back bar — the Android
+    // analogue of the iOS NavigationLink push inside the account sheet.
+    subpage?.let { page ->
+        SubpageHost(page.title, onBack = { subpage = null }) {
+            when (page) {
+                AccountSubpage.Plans -> PlansScreen(entitlements)
+                AccountSubpage.About -> AboutScreen()
+                AccountSubpage.Privacy -> PrivacyScreen()
+                AccountSubpage.Terms -> TermsScreen()
+            }
+        }
+        return
+    }
 
     Column(
         modifier = Modifier
@@ -125,7 +153,9 @@ fun AccountScreen(
             }
 
             AppearanceSection(appearance, onAppearanceChange)
-            AboutSection { showComingSoon = it }
+            PlanSection(activeTier) { subpage = AccountSubpage.Plans }
+            SupportSection { showFeedback = true }
+            AboutSection { subpage = it }
 
             if (user != null) {
                 // In-app account deletion — required store policy for
@@ -186,16 +216,17 @@ fun AccountScreen(
         )
     }
 
-    showComingSoon?.let { title ->
-        AlertDialog(
-            onDismissRequest = { showComingSoon = null },
-            title = { Text(title) },
-            text = { Text("This page arrives in Phase 8.") },
-            confirmButton = {
-                TextButton(onClick = { showComingSoon = null }) { Text("OK") }
-            },
-        )
+    if (showFeedback) {
+        FeedbackSheet(FeedbackSource.Manual, auth, onDismiss = { showFeedback = false })
     }
+}
+
+/** The pages the account sheet pushes to. */
+enum class AccountSubpage(val title: String) {
+    Plans("Plans"),
+    About("About FinnaCalc"),
+    Privacy("Privacy Policy"),
+    Terms("Terms of Service"),
 }
 
 // MARK: - Hero (signed out)
@@ -346,11 +377,15 @@ private fun AppearanceSection(
 // MARK: - About
 
 @Composable
-private fun AboutSection(onOpen: (String) -> Unit) {
+private fun AboutSection(onOpen: (AccountSubpage) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
         SectionLabel("ABOUT")
         Column(cardSurface(RoundedCornerShape(16.dp))) {
-            listOf("About FinnaCalc", "Privacy policy", "Terms of service").forEachIndexed { index, title ->
+            listOf(
+                AccountSubpage.About to "About FinnaCalc",
+                AccountSubpage.Privacy to "Privacy policy",
+                AccountSubpage.Terms to "Terms of service",
+            ).forEachIndexed { index, (page, title) ->
                 if (index > 0) {
                     Box(
                         Modifier
@@ -362,7 +397,7 @@ private fun AboutSection(onOpen: (String) -> Unit) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fcPressable { onOpen(title) }
+                        .fcPressable { onOpen(page) }
                         .padding(horizontal = 15.dp, vertical = 13.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -402,3 +437,101 @@ private fun cardSurface(shape: RoundedCornerShape): Modifier =
         .clip(shape)
         .background(Theme.colors.card)
         .border(1.dp, Theme.colors.border, shape)
+
+// MARK: - Plan + support rows (Phase 8)
+
+/**
+ * What the user actually holds, never a guess: with no active tier this says
+ * Free and offers the upgrade, rather than implying a plan that isn't there.
+ */
+@Composable
+private fun PlanSection(activeTier: PlanTier?, onOpen: () -> Unit) {
+    val plan = activeTier?.let { PlanCatalog.plan(it) }
+    Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
+        SectionLabel("PLAN")
+        Row(
+            modifier = cardSurface(RoundedCornerShape(16.dp))
+                .fcPressable(onOpen)
+                .padding(horizontal = 15.dp, vertical = 13.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    plan?.name ?: "Free",
+                    style = Theme.sans(Theme.FontSize.sm, FontWeight.SemiBold),
+                    color = Theme.colors.foreground,
+                )
+                Text(
+                    plan?.tagline ?: "See what the paid plans add",
+                    style = Theme.sans(12),
+                    color = Theme.colors.mutedForeground,
+                )
+            }
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = Theme.colors.borderStrong,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun SupportSection(onFeedback: () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
+        SectionLabel("SUPPORT")
+        Row(
+            modifier = cardSurface(RoundedCornerShape(16.dp))
+                .fcPressable(onFeedback)
+                .padding(horizontal = 15.dp, vertical = 13.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                "Send feedback",
+                style = Theme.sans(Theme.FontSize.sm, FontWeight.SemiBold),
+                color = Theme.colors.foreground,
+                modifier = Modifier.weight(1f),
+            )
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = Theme.colors.borderStrong,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+    }
+}
+
+/** A pushed page inside the account sheet: back bar over full-bleed content. */
+@Composable
+private fun SubpageHost(title: String, onBack: () -> Unit, content: @Composable () -> Unit) {
+    BackHandler(onBack = onBack)
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(Theme.colors.surfaceSunken)
+    ) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 22.dp, vertical = 14.dp),
+        ) {
+            Text(
+                "Back",
+                style = Theme.sans(Theme.FontSize.sm, FontWeight.SemiBold),
+                color = Theme.colors.primary,
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .fcPressable(onBack),
+            )
+            Text(
+                title,
+                style = Theme.sans(16, FontWeight.Bold),
+                color = Theme.colors.foreground,
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
+        Box(Modifier.weight(1f)) { content() }
+    }
+}
