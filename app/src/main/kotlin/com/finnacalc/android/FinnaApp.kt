@@ -13,6 +13,8 @@ import android.app.Application
 import com.finnacalc.android.core.auth.AuthManager
 import com.finnacalc.android.core.designsystem.AppearanceStore
 import com.finnacalc.android.core.networking.ApiClient
+import com.finnacalc.android.core.util.JsonPrefs
+import com.finnacalc.android.features.budgeting.BudgetStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -26,10 +28,20 @@ class FinnaApp : Application() {
     lateinit var appearanceStore: AppearanceStore
         private set
 
+    /**
+     * Shared budget/goals store — one instance for the whole app so the Home
+     * tab's Expenses & Goals cards and the Budgeting tab stay in sync
+     * (mirrors the iOS @StateObject at the app root).
+     */
+    lateinit var budget: BudgetStore
+        private set
+
     override fun onCreate() {
         super.onCreate()
+        JsonPrefs.init(this)
         auth = AuthManager(scope = appScope)
         appearanceStore = AppearanceStore(this)
+        budget = BudgetStore()
         // Forward the Supabase access token to the API client as a Bearer.
         ApiClient.shared.tokenProvider = { auth.accessToken() }
     }
