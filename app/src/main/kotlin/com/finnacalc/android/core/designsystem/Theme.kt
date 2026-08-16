@@ -86,6 +86,12 @@ class FCColorScheme(
     val positive: Color,
     /** Negative / cost figures — red-600 (light) / red-500 (dark). */
     val negative: Color,
+    /** Principal metric — purple-600 (light) / purple-400 (dark). */
+    val accentPurple: Color,
+    /** Secondary/adjustment metric — orange-600 (light) / orange-400 (dark). */
+    val accentOrange: Color,
+    /** Live-estimate strip / results-panel background (soft brand-blue tint). */
+    val primarySoftBG: Color,
     val isDark: Boolean,
 ) {
     val popover: Color get() = card
@@ -121,6 +127,9 @@ val FCLightColors = FCColorScheme(
     caution = P.amber500,
     positive = P.green600,
     negative = P.red600,
+    accentPurple = Color(0xFF9333EA),
+    accentOrange = Color(0xFFEA580C),
+    primarySoftBG = Color(0xFFE6F1FE),  // hsl(214 95% 95%)
     isDark = false,
 )
 
@@ -146,6 +155,9 @@ val FCDarkColors = FCColorScheme(
     caution = P.amber500,
     positive = P.green400,
     negative = P.red500,
+    accentPurple = Color(0xFFC084FC),
+    accentOrange = Color(0xFFFB923C),
+    primarySoftBG = Color(0xFF192539),  // hsl(217 40% 16%)
     isDark = true,
 )
 

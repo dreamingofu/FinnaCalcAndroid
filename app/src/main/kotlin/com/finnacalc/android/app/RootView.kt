@@ -62,6 +62,7 @@ import com.finnacalc.android.core.designsystem.FCWordmark
 import com.finnacalc.android.core.designsystem.Theme
 import com.finnacalc.android.features.auth.AccountScreen
 import com.finnacalc.android.features.auth.AuthScreen
+import com.finnacalc.android.features.calculators.CalculatorsHubView
 import com.finnacalc.android.features.shared.ComingSoonView
 
 // MARK: - Tabs
@@ -170,11 +171,9 @@ private fun MainTabs(
         ) {
             Box(Modifier.widthIn(max = Theme.readableWidth)) {
                 when (selection) {
-                    FinnaTab.Home -> ComingSoonView(
-                        FinnaTab.Home.icon, "Home",
-                        "Your dashboard — expenses, goals, markets, and FinnaBot.",
-                        "Coming in Phase 8",
-                    )
+                    // The calculator hub stands in for Home until the real
+                    // dashboard lands in Phase 8 and absorbs the catalog.
+                    FinnaTab.Home -> CalculatorsHubView()
                     FinnaTab.Budgeting -> ComingSoonView(
                         FinnaTab.Budgeting.icon, "Budgeting",
                         "Income, expenses, goals, and bank sync will live here.",
