@@ -110,9 +110,14 @@ fun HomeScreen(
             .padding(top = 8.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        Header(user)
-        // 18dp below the header — the section gap is 24.
-        Box(Modifier.padding(top = (-6).dp)) { PromptCard(onOpenChat) }
+        // The prompt sits 18dp under the header while everything else keeps
+        // the 24dp section gap. iOS expresses that as a -6 top padding on the
+        // prompt; Compose forbids negative padding outright, so the pair gets
+        // its own column at the tighter spacing instead.
+        Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
+            Header(user)
+            PromptCard(onOpenChat)
+        }
         ExpensesBigCard(budget)
         InvestingBigCard(user)
         GoalsBigCard(budget)
