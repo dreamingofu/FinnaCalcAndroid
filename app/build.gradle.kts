@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.okhttp.sse)
     implementation(libs.supabase.auth)
     implementation(libs.ktor.client.okhttp)
+    implementation(libs.plaid.link)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
