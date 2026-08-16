@@ -22,6 +22,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -42,7 +43,6 @@ import com.finnacalc.android.core.designsystem.Theme
 import com.finnacalc.android.core.market.BrandLogo
 import com.finnacalc.android.core.market.LogoDev
 import com.finnacalc.android.features.budgeting.BudgetCategoryStyle
-import androidx.compose.material3.Text
 
 @Composable
 fun CompanyLogo(

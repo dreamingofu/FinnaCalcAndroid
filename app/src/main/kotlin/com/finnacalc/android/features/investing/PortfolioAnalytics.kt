@@ -17,11 +17,11 @@ package com.finnacalc.android.features.investing
 
 import com.finnacalc.android.core.snaptrade.BrokeragePosition
 import com.finnacalc.android.core.snaptrade.SnapTradeOrder
-import kotlinx.serialization.Serializable
 import kotlin.math.ln
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
+import kotlinx.serialization.Serializable
 
 // MARK: - Per-symbol inputs
 

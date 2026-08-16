@@ -34,14 +34,14 @@ import com.finnacalc.android.core.snaptrade.SnapTradeConnection
 import com.finnacalc.android.core.snaptrade.SnapTradeOrder
 import com.finnacalc.android.core.snaptrade.SnapTradeService
 import com.finnacalc.android.core.util.JsonPrefs
+import java.time.Instant
+import kotlin.math.abs
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.time.Instant
-import kotlin.math.abs
 
 data class PortfolioUiState(
     val loading: Boolean = true,

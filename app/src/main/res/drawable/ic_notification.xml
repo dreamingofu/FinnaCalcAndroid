@@ -1,0 +1,15 @@
+<!--
+  Notification icon. Android renders these as a silhouette (alpha only), so
+  this is a solid single-path mark rather than the full-colour launcher icon:
+  a document with a dollar sign, matching the app's own tax/finance motif.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FFFFFF">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M14,2L6,2C4.9,2 4.01,2.9 4.01,4L4,20C4,21.1 4.89,22 5.99,22L18,22C19.1,22 20,21.1 20,20L20,8L14,2ZM13,9L13,3.5L18.5,9L13,9ZM12.5,18.5L12.5,17.7C13.65,17.5 14.5,16.75 14.5,15.6C14.5,14.15 13.25,13.65 12.1,13.35C10.95,13.05 10.6,12.7 10.6,12.2C10.6,11.65 11.1,11.25 11.95,11.25C12.85,11.25 13.2,11.7 13.25,12.35L14.55,12.35C14.5,11.45 13.95,10.65 12.95,10.4L12.95,9.5L11.5,9.5L11.5,10.4C10.5,10.6 9.7,11.3 9.7,12.25C9.7,13.55 10.85,14.05 12.05,14.35C13.15,14.6 13.4,15 13.4,15.45C13.4,15.75 13.15,16.35 12.05,16.35C11,16.35 10.6,15.9 10.55,15.25L9.25,15.25C9.3,16.35 10.05,17.05 11.05,17.3L11.05,18.5L12.5,18.5Z" />
+</vector>

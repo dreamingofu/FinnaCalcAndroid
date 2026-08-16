@@ -69,9 +69,9 @@ import com.finnacalc.android.core.snaptrade.SnapTradeOrder
 import com.finnacalc.android.core.snaptrade.SnapTradeService
 import com.finnacalc.android.core.util.HistoryDate
 import com.finnacalc.android.features.calculators.CalcFormat
-import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
+import kotlinx.coroutines.launch
 
 @Composable
 fun PortfolioScreen(

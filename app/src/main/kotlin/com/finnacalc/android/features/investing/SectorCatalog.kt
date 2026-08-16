@@ -13,8 +13,8 @@ package com.finnacalc.android.features.investing
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Business
-import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.MedicalServices
+import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SettingsInputAntenna
 import androidx.compose.material.icons.filled.ShoppingCart

@@ -14,6 +14,7 @@ import com.finnacalc.android.core.auth.AuthManager
 import com.finnacalc.android.core.designsystem.AppearanceStore
 import com.finnacalc.android.core.feedback.FeedbackService
 import com.finnacalc.android.core.networking.ApiClient
+import com.finnacalc.android.core.notifications.Notifier
 import com.finnacalc.android.core.util.JsonPrefs
 import com.finnacalc.android.features.budgeting.BudgetStore
 import com.finnacalc.android.features.plans.EntitlementStore
@@ -50,6 +51,7 @@ class FinnaApp : Application() {
         budget = BudgetStore()
         entitlements = EntitlementStore(this)
         FeedbackService.readVersion(this)
+        Notifier.init(this)
         // Forward the Supabase access token to the API client as a Bearer.
         ApiClient.shared.tokenProvider = { auth.accessToken() }
     }
