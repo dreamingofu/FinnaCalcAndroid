@@ -417,6 +417,7 @@ data class Warning(val code: String, val message: String)
 enum class AuditSeverity {
     @SerialName("info") Info,
     @SerialName("warn") Warn,
+    @SerialName("high") High,
 }
 
 @Serializable

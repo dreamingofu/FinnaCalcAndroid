@@ -37,7 +37,7 @@ idioms don't map 1:1, use the closest Compose equivalent (noted below).
   - **5c** — brokerage UI: SnapTrade connect flow (own broker picker + access step), portfolio hero/holdings/orders with account selection, analytics cards, two-step order ticket. ✅ (trade tracker + investing goals fold into Phase 8)
 - **6. Taxes** — `Features/Taxes`. Split in two PRs:
   - **6a** — the 1040 engine: constants, models, all pipeline stages (income, SE, cap gains, SS, adjustments, deductions, AMT, QBI, credits, other taxes, payments), state tax data, and the orchestrator. 35 unit tests against published 2025 figures. ✅
-  - **6b** — UI: TaxesView hub, interview question player, review/insight screens, tax calculators.
+  - **6b** — UI: Taxes tab launcher, the guided filing experience (hub checklist, life situations, one-question-per-screen player), review + summary screens, and the five quick calculators. 29 unit tests over routing, `buildReturn`, and `build1040Summary`. ✅
 - **7. FinnaBot chat** — streaming chat (`Features/Chat`), shell-level conversation state.
 - **8. Remaining + polish** — Education, Pages, Plans, Feedback, Goals (+ widget as Glance app widget), notifications (SubscriptionNotifier), real app icon, Home dashboard.
 
