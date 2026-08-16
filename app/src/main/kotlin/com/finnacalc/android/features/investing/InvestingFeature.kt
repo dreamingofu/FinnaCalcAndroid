@@ -36,7 +36,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +50,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.finnacalc.android.core.auth.AuthManager
 import com.finnacalc.android.core.designsystem.FCTextField
 import com.finnacalc.android.core.designsystem.Theme
 import com.finnacalc.android.core.designsystem.fcPressable
@@ -66,14 +70,24 @@ private enum class InvestingTab(val title: String) {
 }
 
 @Composable
-fun InvestingFeature() {
+fun InvestingFeature(auth: AuthManager) {
     val stack = remember { mutableStateListOf<InvestingDest>() }
+    // The order ticket is a sheet over whatever is showing, so it lives here
+    // rather than in the stack.
+    var ticket by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
+    var reloadKey by remember { mutableIntStateOf(0) }
+
     if (stack.isNotEmpty()) {
         BackHandler { stack.removeAt(stack.lastIndex) }
     }
 
     when (val top = stack.lastOrNull()) {
-        null -> InvestingHome { stack.add(it) }
+        null -> InvestingHome(
+            auth = auth,
+            reloadKey = reloadKey,
+            push = { stack.add(it) },
+            onTrade = { symbol, sell -> ticket = symbol to sell },
+        )
         is InvestingDest.Stock -> StockScreen(top.symbol)
         is InvestingDest.Sector -> {
             val sector = SectorCatalog.all.firstOrNull { it.id == top.sectorId }
@@ -82,10 +96,25 @@ fun InvestingFeature() {
             }
         }
     }
+
+    ticket?.let { (symbol, sell) ->
+        OrderTicketSheet(
+            symbol = symbol,
+            startWithSell = sell,
+            onDismiss = { ticket = null },
+            // A placed order changes the portfolio, so the page reloads.
+            onPlaced = { reloadKey += 1 },
+        )
+    }
 }
 
 @Composable
-private fun InvestingHome(push: (InvestingDest) -> Unit) {
+private fun InvestingHome(
+    auth: AuthManager,
+    reloadKey: Int,
+    push: (InvestingDest) -> Unit,
+    onTrade: (String, Boolean) -> Unit,
+) {
     var activeTab by remember { mutableStateOf(InvestingTab.Discover) }
     var searchTerm by remember { mutableStateOf("") }
     var searchResults by remember { mutableStateOf<List<StockSearchResult>>(emptyList()) }
@@ -165,13 +194,23 @@ private fun InvestingHome(push: (InvestingDest) -> Unit) {
                 onOpenSymbol = { push(InvestingDest.Stock(it)) },
                 onOpenSector = { push(InvestingDest.Sector(it.id)) },
             )
-            InvestingTab.Portfolio -> Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                WatchlistCard { push(InvestingDest.Stock(it)) }
-                Text(
-                    "Connecting a brokerage — holdings, orders and the portfolio analysis — arrives in the next release.",
-                    style = Theme.sans(Theme.FontSize.xs),
-                    color = Theme.colors.mutedForeground,
-                )
+            InvestingTab.Portfolio -> {
+                val portfolioViewModel: PortfolioViewModel = viewModel()
+                val portfolioState by portfolioViewModel.state.collectAsState()
+                // A placed order invalidates holdings and orders.
+                LaunchedEffect(reloadKey) { if (reloadKey > 0) portfolioViewModel.refresh() }
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    PortfolioScreen(
+                        auth = auth,
+                        onOpenSymbol = { push(InvestingDest.Stock(it)) },
+                        onTrade = onTrade,
+                        viewModel = portfolioViewModel,
+                    )
+                    if (portfolioState.holdings.isNotEmpty()) {
+                        PortfolioAnalyticsSection(portfolioState)
+                    }
+                    WatchlistCard { push(InvestingDest.Stock(it)) }
+                }
             }
             InvestingTab.Screener -> ScreenerScreen { push(InvestingDest.Stock(it)) }
         }
