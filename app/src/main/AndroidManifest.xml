@@ -11,6 +11,7 @@
         android:allowBackup="true"
         android:label="FinnaCalc"
         android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinnaCalc">
         <activity
@@ -31,6 +32,20 @@
                 <data android:scheme="finnacalc" android:host="auth-callback" />
             </intent-filter>
         </activity>
+
+        <!-- Goals widget. Reads the snapshot the app publishes; it never
+             reaches into the app's own stores, since the host launcher runs
+             it in a different process. -->
+        <receiver
+            android:name=".widget.GoalsWidgetReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/goals_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

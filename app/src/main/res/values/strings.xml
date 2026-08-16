@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">FinnaCalc</string>
+    <string name="goals_widget_description">Your savings goals, closest to done first.</string>
+</resources>
