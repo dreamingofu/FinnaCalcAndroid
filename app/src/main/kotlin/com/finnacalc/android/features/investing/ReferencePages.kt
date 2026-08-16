@@ -25,6 +25,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -80,14 +83,16 @@ val curatedEtfs = listOf(
 
 @Composable
 fun EtfListScreen(onOpenSymbol: (String) -> Unit) {
-    Column(
+    // A LazyColumn: every row pulls its own live quote, so composing all of
+    // them up front means thirteen requests to fill one screen.
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Theme.colors.background)
-            .verticalScroll(rememberScrollState())
-            .padding(20.dp),
+            .background(Theme.colors.background),
+        contentPadding = PaddingValues(20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
+        item("hero") {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Box(
                 modifier = Modifier
@@ -110,13 +115,12 @@ fun EtfListScreen(onOpenSymbol: (String) -> Unit) {
                 color = Theme.colors.mutedForeground,
             )
         }
+        }
 
-        HorizontalDivider(color = Theme.colors.border)
+        item("divider") { HorizontalDivider(color = Theme.colors.border) }
 
-        Column(verticalArrangement = Arrangement.spacedBy(22.dp)) {
-            curatedEtfs.forEachIndexed { index, etf ->
-                EtfRow(etf, Modifier.staggeredAppear(index)) { onOpenSymbol(etf.symbol) }
-            }
+        items(curatedEtfs, key = { it.symbol }) { etf ->
+            EtfRow(etf) { onOpenSymbol(etf.symbol) }
         }
     }
 }

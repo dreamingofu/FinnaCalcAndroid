@@ -2,6 +2,7 @@ package com.finnacalc.android.features.investing
 
 import com.finnacalc.android.core.snaptrade.BrokeragePosition
 import com.finnacalc.android.core.util.JsonPrefs
+import com.finnacalc.android.features.budgeting.GoalEmoji
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -234,6 +235,30 @@ class InvestingGoalsTest {
         val a = InvestingGoalAlertCenter.alertFor(goal(), 50).identifier
         val b = InvestingGoalAlertCenter.alertFor(goal(), 75).identifier
         assertTrue(a != b)
+    }
+
+    // MARK: - Emoji
+
+    @Test
+    fun `a goal's emoji comes from its name, as it does in budgeting`() {
+        // The same suggester both sides of the app use, so an investing goal
+        // named "New car" wears the same glyph as the budgeting goal of that
+        // name. It used to be a hardcoded target.
+        assertEquals("🚗", goal().copy(name = "New car").resolvedEmoji)
+        assertEquals("🏠", goal().copy(name = "House downpayment").resolvedEmoji)
+        assertEquals("🌴", goal().copy(name = "Retirement").resolvedEmoji)
+    }
+
+    @Test
+    fun `a chosen emoji outranks the suggestion`() {
+        assertEquals("🎸", goal().copy(name = "New car", emoji = "🎸").resolvedEmoji)
+    }
+
+    @Test
+    fun `an unmatched name falls back rather than showing nothing`() {
+        assertEquals(GoalEmoji.FALLBACK, goal().copy(name = "Zzzz").resolvedEmoji)
+        // An empty override is not a choice; the suggester still runs.
+        assertEquals("🚗", goal().copy(name = "Car fund", emoji = "").resolvedEmoji)
     }
 
     // MARK: - Store

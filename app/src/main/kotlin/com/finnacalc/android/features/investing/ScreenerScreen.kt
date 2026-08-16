@@ -20,6 +20,11 @@
 package com.finnacalc.android.features.investing
 
 import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -144,8 +149,13 @@ fun ScreenerScreen(onOpenSymbol: (String) -> Unit) {
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     SortKey.entries.forEach { key ->
                         Chip(
-                            key.title + if (key == sortKey) (if (sortAscending) " ↑" else " ↓") else "",
+                            key.title,
                             selected = key == sortKey,
+                            // The direction is an icon, as it is on iOS; a text
+                            // arrow rendered thin and off the label's baseline.
+                            trailing = if (key != sortKey) null else {
+                                if (sortAscending) Icons.Filled.ArrowUpward else Icons.Filled.ArrowDownward
+                            },
                         ) {
                             if (key == sortKey) sortAscending = !sortAscending else {
                                 sortKey = key
@@ -179,18 +189,37 @@ fun ScreenerScreen(onOpenSymbol: (String) -> Unit) {
 }
 
 @Composable
-private fun Chip(label: String, selected: Boolean, onClick: () -> Unit) {
-    Text(
-        label,
-        style = Theme.sans(Theme.FontSize.xs, if (selected) FontWeight.Bold else FontWeight.Medium),
-        color = if (selected) Color.White else Theme.colors.mutedForeground,
-        maxLines = 1,
+private fun Chip(
+    label: String,
+    selected: Boolean,
+    trailing: ImageVector? = null,
+    onClick: () -> Unit,
+) {
+    val tint = if (selected) Color.White else Theme.colors.mutedForeground
+    Row(
         modifier = Modifier
             .clip(CircleShape)
             .background(if (selected) Theme.colors.primary else Theme.colors.secondary)
-            .clickable(onClick = onClick)
+            .fcPressable(onClick)
             .padding(horizontal = 12.dp, vertical = 7.dp),
-    )
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            label,
+            style = Theme.sans(Theme.FontSize.xs, if (selected) FontWeight.Bold else FontWeight.Medium),
+            color = tint,
+            maxLines = 1,
+        )
+        if (trailing != null) {
+            Icon(
+                trailing,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier.size(11.dp),
+            )
+        }
+    }
 }
 
 @Composable

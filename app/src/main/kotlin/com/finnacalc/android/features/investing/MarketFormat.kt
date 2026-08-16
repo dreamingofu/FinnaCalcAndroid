@@ -10,6 +10,11 @@
 package com.finnacalc.android.features.investing
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NorthEast
+import androidx.compose.material.icons.filled.SouthEast
+import androidx.compose.material3.Icon
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -74,7 +79,12 @@ fun ChangePill(
         horizontalArrangement = Arrangement.spacedBy(2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(if (isUp) "↗" else "↘", style = Theme.sans(fontSize - 1, FontWeight.Bold), color = tint)
+        Icon(
+            if (isUp) Icons.Filled.NorthEast else Icons.Filled.SouthEast,
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier.size((fontSize - 1).dp),
+        )
         Text(MarketFormat.percent(changePct), style = Theme.figure(fontSize, FontWeight.Bold), color = tint)
     }
 }

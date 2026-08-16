@@ -28,6 +28,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -60,7 +62,6 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import com.finnacalc.android.core.designsystem.Theme
 import com.finnacalc.android.core.designsystem.fcPressable
-import com.finnacalc.android.core.designsystem.staggeredAppear
 
 @Composable
 fun TradeTrackerScreen(onOpenSymbol: (String) -> Unit = {}) {
@@ -76,55 +77,70 @@ fun TradeTrackerScreen(onOpenSymbol: (String) -> Unit = {}) {
     var filter by remember { mutableStateOf<TrackerCategory?>(null) }
     val following by TrackerFollowStore.ids.collectAsState()
 
-    Column(
+    // A LazyColumn, not a scrolling Column: 36 rows each pull a portrait, and
+    // composing every one of them up front fired 36 image requests to draw a
+    // handful of visible avatars.
+    val followed = TrackerCatalog.all.filter { following.contains(it.id) }
+    val groups = buildList {
+        if (followed.isNotEmpty() && filter == null) add("FOLLOWING" to followed)
+        val categories = if (filter != null) listOf(filter!!) else TrackerCategory.entries
+        categories.forEach { add(it.title.uppercase() to TrackerCatalog.inCategory(it)) }
+    }
+
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Theme.colors.background)
-            .verticalScroll(rememberScrollState())
-            .padding(vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
+            .background(Theme.colors.background),
+        contentPadding = PaddingValues(vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Text(
-                "Trade Tracker",
-                style = Theme.sans(26, FontWeight.Bold),
-                color = Theme.colors.foreground,
-            )
-            Text(
-                "Follow the investors, insiders, and politicians whose trades get watched. " +
-                    "Their filings arrive here as we can read them.",
-                style = Theme.sans(Theme.FontSize.sm),
-                color = Theme.colors.mutedForeground,
-            )
-        }
-
-        // Category chips: All plus the three groups.
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            item("all") { FilterChip("All", filter == null) { filter = null } }
-            items(TrackerCategory.entries.size) { i ->
-                val category = TrackerCategory.entries[i]
-                FilterChip(category.title, filter == category) { filter = category }
+        item("header") {
+            Column(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 0.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Text(
+                    "Trade Tracker",
+                    style = Theme.sans(26, FontWeight.Bold),
+                    color = Theme.colors.foreground,
+                )
+                Text(
+                    "Follow the investors, insiders, and politicians whose trades get watched. " +
+                        "Their filings arrive here as we can read them.",
+                    style = Theme.sans(Theme.FontSize.sm),
+                    color = Theme.colors.mutedForeground,
+                )
             }
         }
 
-        // Following first, when there is one — the group the user built.
-        val followed = TrackerCatalog.all.filter { following.contains(it.id) }
-        if (followed.isNotEmpty() && filter == null) {
-            PersonGroup("FOLLOWING", followed) { person = it }
+        // Category chips: All plus the three groups.
+        item("filters") {
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(top = 10.dp),
+            ) {
+                item("all") { FilterChip("All", filter == null) { filter = null } }
+                items(TrackerCategory.entries.size) { i ->
+                    val category = TrackerCategory.entries[i]
+                    FilterChip(category.title, filter == category) { filter = category }
+                }
+            }
         }
 
-        val groups = if (filter != null) listOf(filter!!) else TrackerCategory.entries
-        groups.forEach { category ->
-            PersonGroup(
-                category.title.uppercase(),
-                TrackerCatalog.inCategory(category),
-            ) { person = it }
+        groups.forEach { (title, people) ->
+            if (people.isEmpty()) return@forEach
+            item("head-$title") {
+                Text(
+                    title,
+                    style = Theme.sans(11, FontWeight.Bold).copy(letterSpacing = 1.2.sp),
+                    color = Theme.colors.mutedForeground,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),
+                )
+            }
+            items(people, key = { "$title-${it.id}" }) { p ->
+                PersonRow(p, Modifier.padding(horizontal = 20.dp)) { person = p.id }
+            }
         }
     }
 }
@@ -141,24 +157,6 @@ private fun FilterChip(title: String, selected: Boolean, onClick: () -> Unit) {
             .fcPressable(onClick)
             .padding(horizontal = 15.dp, vertical = 8.dp),
     )
-}
-
-@Composable
-private fun PersonGroup(title: String, people: List<TrackedPerson>, onOpen: (String) -> Unit) {
-    if (people.isEmpty()) return
-    Column(
-        modifier = Modifier.padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        Text(
-            title,
-            style = Theme.sans(11, FontWeight.Bold).copy(letterSpacing = 1.2.sp),
-            color = Theme.colors.mutedForeground,
-        )
-        people.forEachIndexed { index, p ->
-            PersonRow(p, Modifier.staggeredAppear(index)) { onOpen(p.id) }
-        }
-    }
 }
 
 @Composable
@@ -246,17 +244,23 @@ fun TrackerAvatar(person: TrackedPerson, size: Dp) {
                 Text(person.emojiBadge, style = Theme.sans((badgeSize.value * 0.62f).toInt()))
             }
         } else if (person.logoSymbol.isNotEmpty() || person.logoDomain.isNotEmpty()) {
+            // The ring is the badge; the logo has to be the ring MINUS its
+            // border, and clipped again on the way in. Sized at the full badge
+            // it overflowed, and a wide wordmark spilled past the circle.
+            val ringWidth = 1.5.dp
             Box(
                 modifier = Modifier
                     .size(badgeSize)
                     .offset(x = 2.dp, y = 2.dp)
                     .clip(CircleShape)
                     .background(Theme.colors.card)
-                    .padding(1.dp),
+                    .padding(ringWidth),
+                contentAlignment = Alignment.Center,
             ) {
                 CompanyLogo(
                     symbol = person.logoSymbol.ifEmpty { person.logoDomain },
-                    size = badgeSize,
+                    modifier = Modifier.clip(CircleShape),
+                    size = badgeSize - ringWidth * 2,
                 )
             }
         }

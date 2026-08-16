@@ -18,6 +18,7 @@ package com.finnacalc.android.features.investing
 
 import com.finnacalc.android.core.snaptrade.BrokeragePosition
 import com.finnacalc.android.core.util.JsonPrefs
+import com.finnacalc.android.features.budgeting.GoalEmoji
 import kotlin.math.floor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -92,6 +93,15 @@ data class InvestingGoal(
      */
     val keptAfterReached: Boolean = false,
 ) {
+    /**
+     * The emoji to display: the user's override, else the name-derived
+     * suggestion — the same rule budgeting goals follow, and the same one iOS
+     * applies (`goal.emoji ?? GoalEmoji.suggest(for: goal.name)`). A hardcoded
+     * glyph here would make an investing goal named "New car" look unlike the
+     * budgeting goal of the same name.
+     */
+    val resolvedEmoji: String get() = emoji?.takeIf { it.isNotEmpty() } ?: GoalEmoji.suggest(name)
+
     /** What a Balance goal's slice is called on cards and rows. */
     val mixScopeLabel: String
         get() = when (mixScope) {

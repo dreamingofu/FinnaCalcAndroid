@@ -216,7 +216,7 @@ private fun WatchlistRow(
             modifier = Modifier
                 .padding(start = 4.dp)
                 .size(28.dp)
-                .clickable(onClick = onRemove)
+                .fcPressable(onRemove)
                 .padding(7.dp),
         )
     }

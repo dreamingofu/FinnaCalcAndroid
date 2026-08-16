@@ -214,7 +214,7 @@ private fun InvestingGoalCard(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                goal.emoji ?: "🎯",
+                goal.resolvedEmoji,
                 style = Theme.sans(20),
                 modifier = Modifier.padding(end = 10.dp),
             )
