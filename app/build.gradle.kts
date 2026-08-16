@@ -41,6 +41,15 @@ android {
     buildFeatures {
         compose = true
     }
+
+    testOptions {
+        unitTests {
+            // Robolectric needs the merged resources and manifest to inflate
+            // an Activity, which the Compose test rule stands its host on.
+            isIncludeAndroidResources = true
+            all { it.systemProperty("robolectric.logging.enabled", "false") }
+        }
+    }
 }
 
 dependencies {
@@ -72,6 +81,12 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    // Compose UI tests run on the JVM under Robolectric, so they belong to
+    // the normal `test` task rather than needing a device.
+    testImplementation(libs.robolectric)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
