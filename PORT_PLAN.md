@@ -26,7 +26,7 @@ idioms don't map 1:1, use the closest Compose equivalent (noted below).
 - **0. Scaffold** — Gradle/AGP/Kotlin/Compose project, package `com.finnacalc.android`. ✅
 - **1. Design system** — port `Core/DesignSystem` (Theme.swift tokens both palettes, figure/mono type styles, FCButton/FCCard/FCTextField/FCBadge equivalents, Motion). Bundle IBM Plex fonts. ✅
 - **2. Auth + shell** — Supabase auth (`Core/Auth`), RootView tab shell (5 tabs: Home, Budgeting, Investing, Taxes, Education), account sheet, splash, appearance setting. ✅ (no Sign in with Apple on Android; Plans/Feedback/About sections follow their phases)
-- **3. Calculators** — `Features/Calculators`: nine standalone calculators.
+- **3. Calculators** — `Features/Calculators`: eleven standalone calculators (incl. Retirement + Compound Interest), temporary hub on the Home tab until Phase 8. ✅
 - **4. Budgeting + Plaid** — `Core/Networking` API client, `Features/Budgeting` (BudgetStore, dashboard, editor, advisor), Plaid link.
 - **5. Investing** — SnapTrade, market data, portfolio ledger, charts.
 - **6. Taxes** — `Features/Taxes/Engine` (1040 engine, pure Kotlin + unit tests), interview UI, filing.
