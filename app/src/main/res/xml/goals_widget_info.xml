@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Goals widget. Two sizes, matching the iOS widget's small and medium
+  families: a 2x2 shows a couple of goals, a 4x2 shows the full four.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="150dp"
+    android:minHeight="110dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
+    android:maxResizeWidth="320dp"
+    android:maxResizeHeight="220dp"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="3600000"
+    android:widgetCategory="home_screen"
+    android:description="@string/goals_widget_description"
+    android:initialLayout="@layout/glance_default_loading_layout" />

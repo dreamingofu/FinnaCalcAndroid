@@ -15,14 +15,16 @@ package com.finnacalc.android.features.budgeting
 
 import com.finnacalc.android.core.plaid.BankTransaction
 import com.finnacalc.android.core.util.JsonPrefs
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.finnacalc.android.widget.GoalSnapshot
+import com.finnacalc.android.widget.GoalsSnapshotStore
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.UUID
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class BudgetStore {
 
@@ -42,7 +44,7 @@ class BudgetStore {
             field = value
             JsonPrefs.persist(value, Keys.GOALS)
             bump()
-            // Widget snapshot publishing lands with the Glance widget (Phase 8).
+            publishWidgetSnapshot()
         }
 
     var history: List<BudgetHistoryEntry> = JsonPrefs.load(Keys.HISTORY) ?: emptyList()
@@ -501,4 +503,24 @@ class BudgetStore {
         /** ISO "yyyy-MM-dd" for today, for typed ledger lines. */
         val todayIso: String get() = LocalDate.now().toString()
     }
+
+    /**
+     * The Goals widget runs in the launcher's process, so it can't read these
+     * stores — it reads a published snapshot instead. Republished on every
+     * goal change so the widget can't show a figure the app has moved past.
+     */
+    private fun publishWidgetSnapshot() {
+        GoalsSnapshotStore.publish(
+            currentGoals.filter { it.targetAmount > 0 }.map { goal ->
+                val measured = GoalProgress.measure(goal, BankLedgerStore.shared)
+                GoalSnapshot(
+                    id = goal.id,
+                    name = goal.name,
+                    current = measured.first,
+                    target = measured.second,
+                )
+            }
+        )
+    }
+
 }

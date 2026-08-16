@@ -64,6 +64,7 @@ import com.finnacalc.android.core.auth.AuthManager
 import com.finnacalc.android.core.designsystem.AppearanceSetting
 import com.finnacalc.android.core.designsystem.FCWordmark
 import com.finnacalc.android.core.designsystem.Theme
+import com.finnacalc.android.core.feedback.SessionFeedback
 import com.finnacalc.android.features.auth.AccountScreen
 import com.finnacalc.android.features.auth.AuthScreen
 import com.finnacalc.android.features.budgeting.BudgetingFeature
@@ -72,6 +73,8 @@ import com.finnacalc.android.features.calculators.CalculatorKind
 import com.finnacalc.android.features.chat.ChatViewModel
 import com.finnacalc.android.features.chat.FinnaBotSheet
 import com.finnacalc.android.features.education.EducationScreen
+import com.finnacalc.android.features.feedback.FeedbackSheet
+import com.finnacalc.android.features.feedback.FeedbackSource
 import com.finnacalc.android.features.home.HomeScreen
 import com.finnacalc.android.features.investing.InvestingFeature
 import com.finnacalc.android.features.shared.ComingSoonView
@@ -134,6 +137,17 @@ private fun MainTabs(
             chat.setInput(question)
             showChat = true
         }
+    }
+
+    val app = LocalContext.current.applicationContext as FinnaApp
+    AppLifecycleEffects(app, app.budget)
+
+    // The feedback prompt shares the chat's slot: it must never cover a
+    // conversation mid-flight, so it only raises when nothing else is up.
+    val wantsFeedback by SessionFeedback.showPrompt.collectAsState()
+    var showFeedback by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(wantsFeedback) {
+        if (wantsFeedback && !showChat && !showAccount && !showAuth) showFeedback = true
     }
 
     Scaffold(
@@ -230,6 +244,13 @@ private fun MainTabs(
 
     if (showChat) {
         FinnaBotSheet(chat) { showChat = false }
+    }
+
+    if (showFeedback) {
+        FeedbackSheet(FeedbackSource.Prompt, auth, onDismiss = {
+            showFeedback = false
+            SessionFeedback.dismiss()
+        })
     }
 
     if (showAccount) {
