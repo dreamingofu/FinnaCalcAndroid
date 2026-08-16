@@ -30,7 +30,7 @@ idioms don't map 1:1, use the closest Compose equivalent (noted below).
 - **4. Budgeting + Plaid** — `Features/Budgeting` + `Core/Plaid`. Split in two PRs:
   - **4a** — data layer: models, ChargeSchedule + date engine, BudgetStore, BankLedgerStore, TransactionCategorizer, CSV/statement parser, GoalProgress/Emoji/Ring/CategoryStyle, Plaid models + service. 18 unit tests. ✅
   - **4b** — UI part 1: Paper token layer, Budgeting hub, My Budget editor (month slots, caps, donut, item sheet with subscription schedules), month/cap/snapshot/history/account/period sheets, Plaid Link SDK flow, CSV import. ✅
-  - **4c** — UI part 2: Goals, History, Subscriptions, Budget Analysis (advisor + BudgetFindings + SubscriptionDetector).
+  - **4c** — UI part 2: Goals, History, Subscriptions, Budget Analysis (advisor + BudgetFindings + SubscriptionDetector). ✅ (goal-alert + charge notifications land in Phase 8; the advisor's written AI report rides on chat in Phase 7)
 - **5. Investing** — SnapTrade, market data, portfolio ledger, charts.
 - **6. Taxes** — `Features/Taxes/Engine` (1040 engine, pure Kotlin + unit tests), interview UI, filing.
 - **7. FinnaBot chat** — streaming chat (`Features/Chat`), shell-level conversation state.
