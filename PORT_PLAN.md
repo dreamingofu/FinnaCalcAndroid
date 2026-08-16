@@ -39,7 +39,9 @@ idioms don't map 1:1, use the closest Compose equivalent (noted below).
   - **6a** — the 1040 engine: constants, models, all pipeline stages (income, SE, cap gains, SS, adjustments, deductions, AMT, QBI, credits, other taxes, payments), state tax data, and the orchestrator. 35 unit tests against published 2025 figures. ✅
   - **6b** — UI: Taxes tab launcher, the guided filing experience (hub checklist, life situations, one-question-per-screen player), review + summary screens, and the five quick calculators. 29 unit tests over routing, `buildReturn`, and `build1040Summary`. ✅
 - **7. FinnaBot chat** — streaming chat (`Features/Chat`) with shell-level conversation state, the portfolio analysis thread, and the Budget Analysis written report (snapshot + cache + follow-ups). 13 markdown/heuristic tests and 13 snapshot/cache tests. ✅
-- **8. Remaining + polish** — Education, Pages, Plans, Feedback, Goals (+ widget as Glance app widget), notifications (SubscriptionNotifier), real app icon, Home dashboard.
+- **8. Remaining + polish** — split across several PRs:
+  - **8a** — Plans over Google Play Billing, About/Privacy/Terms, Feedback. ✅
+  - **8b** — Education tab: catalog, relevance search, topic and lesson pages. ✅
 
 ## Conventions carried over from iOS (see ../FinnaCalcIOS/CLAUDE.md)
 

@@ -70,6 +70,7 @@ import com.finnacalc.android.features.budgeting.BudgetingFeature
 import com.finnacalc.android.features.calculators.CalculatorsHubView
 import com.finnacalc.android.features.chat.ChatViewModel
 import com.finnacalc.android.features.chat.FinnaBotSheet
+import com.finnacalc.android.features.education.EducationScreen
 import com.finnacalc.android.features.investing.InvestingFeature
 import com.finnacalc.android.features.shared.ComingSoonView
 import com.finnacalc.android.features.taxes.ui.TaxesScreen
@@ -213,11 +214,7 @@ private fun MainTabs(
                     )
                     FinnaTab.Investing -> InvestingFeature(auth)
                     FinnaTab.Taxes -> TaxesScreen()
-                    FinnaTab.Education -> ComingSoonView(
-                        FinnaTab.Education.icon, "Education",
-                        "Financial topics, calculators, and research will live here.",
-                        "Coming in Phase 3",
-                    )
+                    FinnaTab.Education -> EducationScreen()
                 }
             }
         }
