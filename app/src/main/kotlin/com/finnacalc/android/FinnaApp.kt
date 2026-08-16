@@ -12,9 +12,11 @@ package com.finnacalc.android
 import android.app.Application
 import com.finnacalc.android.core.auth.AuthManager
 import com.finnacalc.android.core.designsystem.AppearanceStore
+import com.finnacalc.android.core.feedback.FeedbackService
 import com.finnacalc.android.core.networking.ApiClient
 import com.finnacalc.android.core.util.JsonPrefs
 import com.finnacalc.android.features.budgeting.BudgetStore
+import com.finnacalc.android.features.plans.EntitlementStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -36,12 +38,18 @@ class FinnaApp : Application() {
     lateinit var budget: BudgetStore
         private set
 
+    /** Play Billing entitlements — one client for the app's lifetime. */
+    lateinit var entitlements: EntitlementStore
+        private set
+
     override fun onCreate() {
         super.onCreate()
         JsonPrefs.init(this)
         auth = AuthManager(scope = appScope)
         appearanceStore = AppearanceStore(this)
         budget = BudgetStore()
+        entitlements = EntitlementStore(this)
+        FeedbackService.readVersion(this)
         // Forward the Supabase access token to the API client as a Bearer.
         ApiClient.shared.tokenProvider = { auth.accessToken() }
     }

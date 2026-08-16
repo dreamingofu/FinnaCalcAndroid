@@ -241,6 +241,7 @@ private fun MainTabs(
                 auth = auth,
                 user = user,
                 appearance = appearance,
+                entitlements = (LocalContext.current.applicationContext as FinnaApp).entitlements,
                 onAppearanceChange = onAppearanceChange,
                 onShowAuth = { showAuth = true },
                 onDismiss = { showAccount = false },

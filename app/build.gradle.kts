@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.supabase.auth)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.plaid.link)
+    implementation(libs.billing.ktx)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
