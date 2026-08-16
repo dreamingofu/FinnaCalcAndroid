@@ -74,7 +74,6 @@ sealed class BudgetingDest {
         val readingBank: Boolean,
     ) : BudgetingDest()
 
-    // Phase 4c destinations — placeholders until their screens land.
     data object Goals : BudgetingDest()
     data object History : BudgetingDest()
     data object Subscriptions : BudgetingDest()
@@ -84,31 +83,38 @@ sealed class BudgetingDest {
 @Composable
 fun BudgetingFeature(store: BudgetStore) {
     val stack = remember { mutableStateListOf<BudgetingDest>() }
+    // A History import hands the snapshot to the editor, which asks the
+    // combine question on top of the budget it would actually land on.
+    var pendingImport by remember { mutableStateOf<BudgetHistoryEntry?>(null) }
 
     if (stack.isNotEmpty()) {
         BackHandler { stack.removeAt(stack.lastIndex) }
     }
 
+    fun replaceWith(dest: BudgetingDest) {
+        if (stack.isNotEmpty()) stack.removeAt(stack.lastIndex)
+        stack.add(dest)
+    }
+
     when (val top = stack.lastOrNull()) {
         null -> BudgetingHub(store) { stack.add(it) }
-        BudgetingDest.MyBudget -> BudgetTabScreen(store, push = { stack.add(it) })
+        BudgetingDest.MyBudget -> BudgetTabScreen(
+            store,
+            push = { stack.add(it) },
+            importOnAppear = pendingImport,
+            onImportConsumed = { pendingImport = null },
+        )
         is BudgetingDest.CategoryItems -> CategoryItemsScreen(store, top)
-        // Phase 4c: real screens replace these.
-        BudgetingDest.Goals -> ComingSoonView(
-            Icons.Default.History, "Goals",
-            "Saving, spending, and income goals with progress rings.", "Coming in Phase 4c",
-        )
-        BudgetingDest.History -> ComingSoonView(
-            Icons.Default.History, "History",
-            "Snapshots and bank imports over time.", "Coming in Phase 4c",
-        )
-        BudgetingDest.Subscriptions -> ComingSoonView(
-            Icons.Default.History, "Subscriptions",
-            "Recurring charges, schedules, and reminders.", "Coming in Phase 4c",
-        )
-        BudgetingDest.Advisor -> ComingSoonView(
-            Icons.Default.History, "Budget Analysis",
-            "Personalized advice from your budget snapshot.", "Coming in Phase 4c",
+        BudgetingDest.Goals -> GoalsScreen(store)
+        BudgetingDest.History -> HistoryScreen(store) { entry ->
+            pendingImport = entry
+            replaceWith(BudgetingDest.MyBudget)
+        }
+        BudgetingDest.Subscriptions -> SubscriptionsScreen(store)
+        BudgetingDest.Advisor -> BudgetAdvisorScreen(
+            store,
+            onOpenBudget = { replaceWith(BudgetingDest.MyBudget) },
+            onOpenGoals = { replaceWith(BudgetingDest.Goals) },
         )
     }
 }

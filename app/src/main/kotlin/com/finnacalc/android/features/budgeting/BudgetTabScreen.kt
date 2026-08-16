@@ -62,6 +62,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -118,7 +119,17 @@ internal fun groupByCategory(items: List<BudgetItem>, type: ItemType): List<Cate
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BudgetTabScreen(store: BudgetStore, push: (BudgetingDest) -> Unit) {
+fun BudgetTabScreen(
+    store: BudgetStore,
+    push: (BudgetingDest) -> Unit,
+    /**
+     * A snapshot to import as soon as the screen appears, handed over by
+     * History's import action. The combine question then gets asked here, on
+     * top of the budget it would actually land on.
+     */
+    importOnAppear: BudgetHistoryEntry? = null,
+    onImportConsumed: () -> Unit = {},
+) {
     store.version.collectAsState().value
     val bank = BankLedgerStore.shared
     bank.version.collectAsState().value
@@ -164,6 +175,25 @@ fun BudgetTabScreen(store: BudgetStore, push: (BudgetingDest) -> Unit) {
     fun openSlot(slot: String) {
         month = slot
         store.rememberSlot(slot)
+    }
+
+    // A snapshot handed over by History, imported once on appear.
+    LaunchedEffect(importOnAppear) {
+        val entry = importOnAppear ?: return@LaunchedEffect
+        val items = store.itemsFromSnapshot(entry)
+        onImportConsumed()
+        if (items.isEmpty()) return@LaunchedEffect
+        val source = "“${entry.name}”"
+        if (bank.isReadingBank) {
+            pendingBankImport = items to source
+        } else if (store.itemsInMonth(BudgetStore.UNDATED_MONTH_KEY).isNotEmpty()) {
+            pendingImport = items to source
+        } else {
+            store.landImport(items, combine = false)
+            month = BudgetStore.UNDATED_MONTH_KEY
+            store.rememberSlot(month)
+            importSuccess = "Imported ${items.size} line${if (items.size == 1) "" else "s"} from $source."
+        }
     }
 
     // Over-cap categories start expanded (once), per the handoff.

@@ -20,11 +20,24 @@ object JsonPrefs {
         encodeDefaults = true
     }
 
-    private lateinit var prefs: SharedPreferences
+    private var prefs: SharedPreferences? = null
+
+    /**
+     * In-memory fallback used when no Context has been supplied — JVM unit
+     * tests construct the stores directly, and a lateinit crash there would
+     * be a test-harness failure rather than anything about the code.
+     */
+    private val memory = mutableMapOf<String, String>()
 
     /** Called once from FinnaApp.onCreate before any store touches it. */
     fun init(context: Context) {
         prefs = context.getSharedPreferences("finnacalc", Context.MODE_PRIVATE)
+    }
+
+    /** Test seam: drops every stored value (and any Context binding). */
+    fun resetForTesting() {
+        prefs = null
+        memory.clear()
     }
 
     inline fun <reified T> load(key: String): T? {
@@ -44,9 +57,10 @@ object JsonPrefs {
         }
     }
 
-    fun raw(key: String): String? = prefs.getString(key, null)
+    fun raw(key: String): String? = prefs?.getString(key, null) ?: memory[key]
 
     fun put(key: String, value: String) {
-        prefs.edit().putString(key, value).apply()
+        val store = prefs
+        if (store != null) store.edit().putString(key, value).apply() else memory[key] = value
     }
 }
