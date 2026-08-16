@@ -1,6 +1,6 @@
 [versions]
-agp = "8.10.1"
-kotlin = "2.1.21"
+agp = "8.13.2"
+kotlin = "2.4.10"
 coreKtx = "1.16.0"
 lifecycle = "2.9.0"
 activityCompose = "1.10.1"
@@ -10,6 +10,8 @@ kotlinxSerialization = "1.8.1"
 kotlinxCoroutines = "1.10.2"
 okhttp = "4.12.0"
 datastore = "1.1.7"
+supabase = "3.7.0"
+ktor = "3.5.2"
 junit = "4.13.2"
 
 [libraries]
@@ -30,6 +32,8 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-sse = { group = "com.squareup.okhttp3", name = "okhttp-sse", version.ref = "okhttp" }
+supabase-auth = { group = "io.github.jan-tennert.supabase", name = "auth-kt", version.ref = "supabase" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 
