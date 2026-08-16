@@ -319,10 +319,14 @@ private fun Heatmap(rows: List<ScreenerRow>, onOpenSymbol: (String) -> Unit) {
                     // Alpha tracks the size of the move, area tracks volume.
                     val intensity = (abs(change) / 5.0).coerceIn(0.15, 0.85)
                     val heightScale = sqrt((row.volume ?: 0.0) / maxVolume).coerceIn(0.45, 1.0)
+                    // Floored at what the three lines actually need. Scaled
+                    // alone the smallest tile came out ~40dp, which clipped the
+                    // percentage mid-glyph and hid the volume entirely — the
+                    // tile reported a move it wasn't tall enough to show.
                     Column(
                         Modifier
                             .weight(1f)
-                            .height((88 * heightScale).dp)
+                            .height((88 * heightScale).dp.coerceAtLeast(64.dp))
                             .clip(RoundedCornerShape(Theme.Radius.md))
                             .background(tint.copy(alpha = intensity.toFloat()))
                             .fcPressable { onOpenSymbol(row.symbol) }
