@@ -13,7 +13,11 @@ export JAVA_HOME="/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
 ./gradlew :app:assembleDebug :app:testDebugUnitTest
 ```
 
-Both must pass before opening a PR. `local.properties` (gitignored) points
+Both must pass before opening a PR. `testDebugUnitTest` includes
+`ScreenRenderTest` — Robolectric-backed Compose smoke tests that compose every
+screen once. They exist because a negative padding (legal in SwiftUI, fatal in
+Compose) shipped and crashed the app on launch, and no logic test could catch
+it. **Add a render case for any new screen.** `local.properties` (gitignored) points
 `sdk.dir` at `~/Library/Android/sdk`.
 
 ## Workflow
